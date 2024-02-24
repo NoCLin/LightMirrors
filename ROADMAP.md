@@ -1,3 +1,5 @@
+- A homepage which shows doc and status
+- Style checker
 - Test
 - Publish to ghcr and dockerhub
 - Configurable upstreams
