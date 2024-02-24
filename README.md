@@ -53,7 +53,7 @@ LightMirrors依赖于三个组件：
 | subdomain | source                          | test command                                                    |
 |-----------|---------------------------------|-----------------------------------------------------------------|
 | pypi      | https://pypi.org                | pip3 download -i https://pypi.local.homeinfra.org/simple jinja2 |
-| torch     | https://download.pytorch.org    | pip3 download -i https://pypi.local.homeinfra.org/whl/ torch    |
+| torch     | https://download.pytorch.org    | pip3 download -i https://torch.local.homeinfra.org/whl/ torch   |
 | dockerhub | https://registry-1.docker.io/v2 | docker pull docker.local.homeinfra.org/alpine                   |
 
 
