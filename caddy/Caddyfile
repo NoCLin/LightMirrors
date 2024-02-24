@@ -1,0 +1,15 @@
+*.{$BASE_DOMAIN} {
+
+  tls {
+     dns cloudflare {env.CLOUDFLARE_DNS_API_TOKEN}
+  }
+
+  reverse_proxy http://lightmirrors:8080
+
+  @aria2 host aria2.{$BASE_DOMAIN}
+  handle @aria2 {
+    root * /wwwroot
+    file_server
+    reverse_proxy /jsonrpc http://aria2:6800
+  }
+}

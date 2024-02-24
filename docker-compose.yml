@@ -1,0 +1,44 @@
+services:
+  lightmirrors:
+    image: lightmirrors/mirrors
+    build: ./mirrors
+    volumes:
+      - ./mirrors:/app
+      - ./data/cache:/app/cache
+    env_file:
+      - .env
+    networks:
+      - app
+    restart: unless-stopped
+    # for linux
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  caddy:
+    image: lightmirrors/caddy
+    build: ./caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/caddy_data:/data/caddy
+    env_file:
+      - .env
+    networks:
+      - app
+    restart: unless-stopped
+  aria2:
+    image: lightmirrors/aria2
+    build: ./aria2
+    volumes:
+      - ./aria2/aria2.conf:/aria2.conf
+      - ./data/cache:/app/cache
+      - ./data/aria2:/data/
+    networks:
+      - app
+    env_file:
+      - .env
+    restart: unless-stopped
+networks:
+  app:
+    driver: bridge

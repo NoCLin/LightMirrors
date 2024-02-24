@@ -1,0 +1,7 @@
+
+data/*
+!data/cache/.gitkeep
+caddy/caddy_data
+.idea
+.env
+node_modules

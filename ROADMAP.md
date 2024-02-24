@@ -1,0 +1,3 @@
+- Test
+- Publish to ghcr and dockerhub
+- Configurable upstreams
