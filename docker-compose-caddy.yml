@@ -15,6 +15,22 @@ services:
       - "host.docker.internal:host-gateway"
     ports:
       - "80:80"
+  caddy:
+    image: lightmirrors/caddy
+    build:
+      context: caddy
+      dockerfile: Dockerfile
+
+    ports:
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/caddy_data:/data/caddy
+    env_file:
+      - .env
+    networks:
+      - app
+    restart: unless-stopped
   aria2:
     image: lightmirrors/aria2
     build: ./aria2

@@ -2,10 +2,12 @@ import os
 
 ARIA2_RPC_URL = os.environ.get("ARIA2_RPC_URL", 'http://aria2:6800/jsonrpc')
 RPC_SECRET = os.environ.get("RPC_SECRET", '')
-BASE_DOMAIN = os.environ.get("BASE_DOMAIN", '127.0.0.1.nip.io')
+BASE_DOMAIN = os.environ.get("BASE_DOMAIN", 'local.homeinfra.org')
 
 PROXY = os.environ.get("PROXY", None)
-CACHE_DIR = os.environ.get("CACHE_DIR", "/app/cache/")
+SCHEME = os.environ.get("SCHEME", None)
+assert SCHEME in ["http", "https"]
 
+CACHE_DIR = os.environ.get("CACHE_DIR", "/app/cache/")
 EXTERNAL_HOST_ARIA2 = f"aria2." + BASE_DOMAIN
-EXTERNAL_URL_ARIA2 = f"https://" + EXTERNAL_HOST_ARIA2
+EXTERNAL_URL_ARIA2 = f"{SCHEME}://{EXTERNAL_HOST_ARIA2}/aria2/index.html"
