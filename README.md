@@ -5,13 +5,16 @@
 
 # LightMirrors
 
-LightMirrors是一个开源的缓存镜像站服务，用于加速软件包下载和镜像拉取。
-目前支持**DockerHub**、PyPI、PyTorch、NPM等镜像缓存服务。
-
 <a href='https://github.com/NoCLin/LightMirrors/'><img src='https://img.shields.io/badge/Light-Mirrors-green'></a>
 <a href='https://github.com/homeinfra-org/infra'><img src='https://img.shields.io/static/v1?label=Home&message=Infra&color=orange'></a>
 [![GitHub](https://img.shields.io/github/stars/NoCLin/LightMirrors?style=social)](https://github.com/NoCLin/LightMirrors)
 [![GitHub](https://img.shields.io/github/forks/NoCLin/LightMirrors?style=social)](https://github.com/NoCLin/LightMirrors)
+
+
+LightMirrors是一个开源的缓存镜像站服务，用于加速软件包下载和镜像拉取。
+目前支持**DockerHub**、PyPI、PyTorch、NPM等镜像缓存服务。 当前项目仍处于早期阶段。
+
+欢迎提交Pull Request和Issue，我们非常期待您的宝贵建议和意见。
 
 ![Demo](docs/images/1.png)
 
