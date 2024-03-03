@@ -104,6 +104,10 @@ LightMirrors依赖于两个组件：
 
 docker pull 的时候添加前缀 `docker.local.homeinfra.org` 即可。
 
+> 请注意：当 `SCHEME=http` 且 `DOCKER_BUILDKIT=1` 时，
+> Dockerfile 中的 `FROM docker.local.homeinfra.org/xxx` 语法默认将从 https 站点拉取镜像，
+> 此时将会出现错误。请使用 `docker pull`代替，或者尝试设置环境变量 `DOCKER_BUILDKIT=0`
+
 ### PyPI
 
 - https: `pip install jinja2 --index-url https://pypi.local.homeinfra.org/simple/`
