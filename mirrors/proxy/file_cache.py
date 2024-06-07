@@ -14,16 +14,23 @@ from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_504_GATEWAY_TI
 from aria2_api import add_download
 
 from config import CACHE_DIR, EXTERNAL_URL_ARIA2, PROXY
+from typing import Optional, Callable
 
 logger = logging.getLogger(__name__)
 
 
 def get_cache_file_and_folder(url: str) -> typing.Tuple[str, str]:
     parsed_url = urlparse(url)
+    hostname = parsed_url.hostname
+    path = parsed_url.path
+    assert hostname
+    assert path
+
     base_dir = pathlib.Path(CACHE_DIR)
     assert parsed_url.path[0] == "/"
     assert parsed_url.path[-1] != "/"
-    cache_file = (base_dir / parsed_url.hostname / parsed_url.path[1:]).resolve()
+    cache_file = (base_dir / hostname / path[1:]).resolve()
+
     assert cache_file.is_relative_to(base_dir)
 
     return str(cache_file), os.path.dirname(cache_file)
@@ -65,12 +72,12 @@ async def get_url_content_length(url):
         return content_len
 
 
-async def try_get_cache(
+async def try_file_based_cache(
         request: Request,
         target_url: str,
         download_wait_time: int = 60,
-        post_process: typing.Callable[[Request, Response], Response] = None,
-) -> typing.Optional[Response]:
+        post_process: Optional[Callable[[Request, Response], Response]] = None,
+) -> Response:
     cache_status = lookup_cache(target_url)
     if cache_status == DownloadingStatus.DOWNLOADED:
         resp = make_cached_response(target_url)
@@ -88,7 +95,7 @@ async def try_get_cache(
     cache_file, cache_file_dir = get_cache_file_and_folder(target_url)
     print("prepare to download", target_url, cache_file, cache_file_dir)
 
-    processed_url = quote(target_url, safe='/:?=&')
+    processed_url = quote(target_url, safe='/:?=&%')
 
     try:
         await add_download(processed_url, save_dir=cache_file_dir)

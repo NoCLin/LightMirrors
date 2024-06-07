@@ -2,16 +2,18 @@ import base64
 import json
 import re
 import time
+from typing import Dict
 
 import httpx
 from starlette.requests import Request
 from starlette.responses import Response
 
+from proxy.file_cache import try_file_based_cache
 from proxy.direct import direct_proxy
 
 BASE_URL = "https://registry-1.docker.io"
 
-cached_token = {
+cached_token: Dict[str, str] = {
 
 }
 
@@ -69,6 +71,22 @@ def get_docker_token(name):
     return token
 
 
+def inject_token(name: str, req: Request, httpx_req: httpx.Request):
+    docker_token = get_docker_token(f"{name}")
+    httpx_req.headers["Authorization"] = f"Bearer {docker_token}"
+    return httpx_req
+
+
+async def post_process(request: Request, response: Response):
+    if response.status_code == 307:
+        location = response.headers["location"]
+        # TODO: logger
+        print("[redirect]", location)
+        return await try_file_based_cache(request, location)
+
+    return response
+
+
 async def docker(request: Request):
     path = request.url.path
     print("[request]", request.method, request.url)
@@ -90,11 +108,9 @@ async def docker(request: Request):
 
     target_url = BASE_URL + f"/v2/{name}/{operation}/{reference}"
 
+    # logger
     print('[PARSED]', path, name, operation, reference, target_url)
 
-    def inject_token(req, httpx_req):
-        docker_token = get_docker_token(f"{name}")
-        httpx_req.headers["Authorization"] = f"Bearer {docker_token}"
-        return httpx_req
-
-    return await direct_proxy(request, target_url, pre_process=inject_token)
+    return await direct_proxy(request, target_url,
+                              pre_process=lambda req, http_req: inject_token(name, req, http_req),
+                              post_process=post_process)

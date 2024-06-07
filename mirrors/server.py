@@ -1,6 +1,7 @@
 import base64
 import signal
 import urllib.parse
+from typing import Callable
 
 import httpx
 import uvicorn
@@ -24,6 +25,7 @@ async def aria2(request: Request, call_next):
     if request.url.path == "/":
         return RedirectResponse("/aria2/index.html")
     if request.url.path == "/jsonrpc":
+        # dont use proxy for internal API
         async with httpx.AsyncClient(mounts={
             "all://": httpx.AsyncHTTPTransport()
         }) as client:
@@ -39,8 +41,11 @@ async def aria2(request: Request, call_next):
 
 
 @app.middleware("http")
-async def capture_request(request: Request, call_next: callable):
+async def capture_request(request: Request, call_next: Callable):
     hostname = request.url.hostname
+    if not hostname:
+        return Response(content="Bad Request", status_code=400)
+
     if not hostname.endswith(f".{BASE_DOMAIN}"):
         return await call_next(request)
 
@@ -81,6 +86,6 @@ if __name__ == '__main__':
     aria2_url_with_auth = EXTERNAL_URL_ARIA2 + "#!/settings/rpc/set?" + query_string
 
     print(f"Download manager (Aria2) at {aria2_url_with_auth}")
-    # FIXME: only proxy headers if SCHME is https
+    # FIXME: only proxy headers if SCHEME is https
     # reload only in dev mode
     uvicorn.run(app="server:app", host="0.0.0.0", port=port, reload=True, proxy_headers=True, forwarded_allow_ips="*")

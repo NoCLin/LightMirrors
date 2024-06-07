@@ -4,7 +4,6 @@ ARIA2_RPC_URL = os.environ.get("ARIA2_RPC_URL", 'http://aria2:6800/jsonrpc')
 RPC_SECRET = os.environ.get("RPC_SECRET", '')
 BASE_DOMAIN = os.environ.get("BASE_DOMAIN", 'local.homeinfra.org')
 
-PROXY = os.environ.get("PROXY", None)
 SCHEME = os.environ.get("SCHEME", None)
 assert SCHEME in ["http", "https"]
 
