@@ -21,4 +21,7 @@ async def torch(request: Request):
     if path.endswith(".whl") or path.endswith(".tar.gz"):
         return await try_file_based_cache(request, target_url)
 
-    return await direct_proxy(request, target_url, )
+    return await direct_proxy(
+        request,
+        target_url,
+    )

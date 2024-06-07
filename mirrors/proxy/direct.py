@@ -9,24 +9,22 @@ from starlette.responses import Response
 SyncPreProcessor = Callable[[Request, HttpxRequest], HttpxRequest]
 
 AsyncPreProcessor = Callable[
-    [Request, HttpxRequest],
-    Coroutine[Request, HttpxRequest, HttpxRequest]
+    [Request, HttpxRequest], Coroutine[Request, HttpxRequest, HttpxRequest]
 ]
 
 SyncPostProcessor = Callable[[Request, Response], Response]
 
 AsyncPostProcessor = Callable[
-    [Request, Response],
-    Coroutine[Request, Response, Response]
+    [Request, Response], Coroutine[Request, Response, Response]
 ]
 
 
 async def direct_proxy(
-        request: Request,
-        target_url: str,
-        pre_process: typing.Union[SyncPreProcessor, AsyncPreProcessor, None] = None,
-        post_process: typing.Union[SyncPostProcessor, AsyncPostProcessor, None] = None,
-        cache_ttl: int = 3600,
+    request: Request,
+    target_url: str,
+    pre_process: typing.Union[SyncPreProcessor, AsyncPreProcessor, None] = None,
+    post_process: typing.Union[SyncPostProcessor, AsyncPostProcessor, None] = None,
+    cache_ttl: int = 3600,
 ) -> Response:
     # httpx will use the following environment variables to determine the proxy
     # https://www.python-httpx.org/environment_variables/#http_proxy-https_proxy-all_proxy
@@ -36,7 +34,11 @@ async def direct_proxy(
             if key not in ["user-agent", "accept"]:
                 del req_headers[key]
 
-        httpx_req: HttpxRequest = client.build_request(request.method, target_url, headers=req_headers, )
+        httpx_req: HttpxRequest = client.build_request(
+            request.method,
+            target_url,
+            headers=req_headers,
+        )
 
         if pre_process:
             new_httpx_req = pre_process(request, httpx_req)
@@ -56,7 +58,7 @@ async def direct_proxy(
         response = Response(
             headers=res_headers,
             content=content,
-            status_code=upstream_response.status_code
+            status_code=upstream_response.status_code,
         )
 
         if post_process:

@@ -13,9 +13,7 @@ from proxy.direct import direct_proxy
 
 BASE_URL = "https://registry-1.docker.io"
 
-cached_token: Dict[str, str] = {
-
-}
+cached_token: Dict[str, str] = {}
 
 # https://github.com/opencontainers/distribution-spec/blob/main/spec.md
 name_regex = "[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*(\/[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*)*"
@@ -40,7 +38,6 @@ def try_extract_image_name(path):
 def get_docker_token(name):
     cached = cached_token.get(name, {})
     exp = cached.get("exp", 0)
-
     if exp > time.time():
         return cached.get("token", 0)
 
@@ -50,12 +47,13 @@ def get_docker_token(name):
         "service": "registry.docker.io",
     }
 
-    response = httpx.get(url, params=params, verify=False)
+    client = httpx.Client()
+    response = client.get(url, params=params)
     response.raise_for_status()
 
     token_data = response.json()
     token = token_data["token"]
-    payload = (token.split(".")[1])
+    payload = token.split(".")[1]
     padding = len(payload) % 4
     payload += "=" * padding
 
@@ -63,10 +61,7 @@ def get_docker_token(name):
     assert payload["iss"] == "auth.docker.io"
     assert len(payload["access"]) > 0
 
-    cached_token[name] = {
-        "exp": payload["exp"],
-        "token": token
-    }
+    cached_token[name] = {"exp": payload["exp"], "token": token}
 
     return token
 
@@ -100,17 +95,20 @@ async def docker(request: Request):
     name, operation, reference = try_extract_image_name(path)
 
     if not name:
-        return Response(content='404 Not Found', status_code=404)
+        return Response(content="404 Not Found", status_code=404)
 
     # support docker pull xxx which name without library
-    if '/' not in name:
+    if "/" not in name:
         name = f"library/{name}"
 
     target_url = BASE_URL + f"/v2/{name}/{operation}/{reference}"
 
     # logger
-    print('[PARSED]', path, name, operation, reference, target_url)
+    print("[PARSED]", path, name, operation, reference, target_url)
 
-    return await direct_proxy(request, target_url,
-                              pre_process=lambda req, http_req: inject_token(name, req, http_req),
-                              post_process=post_process)
+    return await direct_proxy(
+        request,
+        target_url,
+        pre_process=lambda req, http_req: inject_token(name, req, http_req),
+        post_process=post_process,
+    )
