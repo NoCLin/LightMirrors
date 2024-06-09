@@ -29,4 +29,5 @@ services:
     restart: unless-stopped
 networks:
   app:
+    name: lightmirrors_app
     driver: bridge

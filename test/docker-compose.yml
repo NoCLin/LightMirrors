@@ -1,0 +1,25 @@
+services:
+  test:
+    image: lightmirrors/test
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - lightmirrors_app
+    external_links:
+      - lightmirrors:aria2.local.homeinfra.org
+      - lightmirrors:docker.local.homeinfra.org
+      - lightmirrors:pypi.local.homeinfra.org
+      - lightmirrors:torch.local.homeinfra.org
+      - lightmirrors:npm.local.homeinfra.org
+      - lightmirrors:ubuntu.local.homeinfra.org
+      - lightmirrors:debian.local.homeinfra.org
+      - lightmirrors:proxy.local.homeinfra.org
+      - lightmirrors:github.local.homeinfra.org
+      - lightmirrors:alpine.local.homeinfra.org
+networks:
+  lightmirrors_app:
+    external: true
