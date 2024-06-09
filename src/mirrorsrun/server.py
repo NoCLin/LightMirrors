@@ -1,3 +1,7 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 import base64
 import signal
 import urllib.parse
@@ -10,17 +14,17 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
 from starlette.staticfiles import StaticFiles
 
-from config import (
+from mirrorsrun.config import (
     BASE_DOMAIN,
     RPC_SECRET,
     EXTERNAL_URL_ARIA2,
     EXTERNAL_HOST_ARIA2,
     SCHEME,
 )
-from sites.docker import docker
-from sites.npm import npm
-from sites.pypi import pypi
-from sites.torch import torch
+from mirrorsrun.sites.docker import docker
+from mirrorsrun.sites.npm import npm
+from mirrorsrun.sites.pypi import pypi
+from mirrorsrun.sites.torch import torch
 
 app = FastAPI()
 

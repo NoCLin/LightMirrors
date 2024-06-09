@@ -1,9 +1,10 @@
 services:
   lightmirrors:
     image: lightmirrors/mirrors
-    build: ./mirrors
+    build:
+      context: ./src
     volumes:
-      - ./mirrors:/app
+      - ./src/:/app
       - ./data/cache:/app/cache
     env_file:
       - .env

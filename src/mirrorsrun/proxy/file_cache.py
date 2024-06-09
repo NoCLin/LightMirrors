@@ -11,9 +11,9 @@ from starlette.requests import Request
 from starlette.responses import Response
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_504_GATEWAY_TIMEOUT
 
-from aria2_api import add_download
+from mirrorsrun.aria2_api import add_download
 
-from config import CACHE_DIR, EXTERNAL_URL_ARIA2
+from mirrorsrun.config import CACHE_DIR, EXTERNAL_URL_ARIA2
 from typing import Optional, Callable
 
 logger = logging.getLogger(__name__)

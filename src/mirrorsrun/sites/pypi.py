@@ -3,8 +3,8 @@ import re
 from starlette.requests import Request
 from starlette.responses import Response
 
-from proxy.direct import direct_proxy
-from proxy.file_cache import try_file_based_cache
+from mirrorsrun.proxy.direct import direct_proxy
+from mirrorsrun.proxy.file_cache import try_file_based_cache
 
 pypi_file_base_url = "https://files.pythonhosted.org"
 pypi_base_url = "https://pypi.org"

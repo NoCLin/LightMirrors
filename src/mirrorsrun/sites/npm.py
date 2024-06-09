@@ -1,6 +1,6 @@
 from starlette.requests import Request
 
-from proxy.direct import direct_proxy
+from mirrorsrun.proxy.direct import direct_proxy
 
 BASE_URL = "https://registry.npmjs.org/"
 

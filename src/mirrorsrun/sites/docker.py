@@ -9,8 +9,8 @@ import httpx
 from starlette.requests import Request
 from starlette.responses import Response
 
-from proxy.direct import direct_proxy
-from proxy.file_cache import try_file_based_cache
+from mirrorsrun.proxy.direct import direct_proxy
+from mirrorsrun.proxy.file_cache import try_file_based_cache
 
 logger = logging.getLogger(__name__)
 

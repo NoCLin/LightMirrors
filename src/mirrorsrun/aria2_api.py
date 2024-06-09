@@ -4,7 +4,7 @@ import uuid
 
 import httpx
 
-from config import RPC_SECRET, ARIA2_RPC_URL
+from mirrorsrun.config import RPC_SECRET, ARIA2_RPC_URL
 
 logger = logging.getLogger(__name__)
 
