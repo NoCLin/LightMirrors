@@ -28,18 +28,11 @@ LightMirrors是一个开源的缓存镜像站服务，用于加速软件包下�
 由于国内访问国外软件源的速度较慢，特别是DockerHub缺少国内镜像站，
 因此我们在本地部署镜像站来加速网络访问和节省外网带宽。
 
+---
+
 ## Quick Start
 
-### Prerequisites
-
-- docker + docker-compose.
-- 一个域名，设置 `*.yourdomain` 的A记录指向您服务器的IP.
-    - `*.local.homeinfra.org` 默认指向 `127.0.0.1`，本地测试可以直接使用。
-- 代理服务器（如有必要）.
-
-> 如果需要使用HTTPS，可以在外层新增一个HTTP网关（如Caddy），请参考后续章节。
-
-执行以下命令以启动LightMirrors：
+执行以下命令试用LightMirrors：
 
 ```bash
 
@@ -60,6 +53,18 @@ pip3 download -i http://torch.local.homeinfra.org/whl/ torch --trusted-host torc
 ```
 
 ### Deployment
+
+
+### Prerequisites
+
+- docker + docker-compose.
+- 一个域名，设置 `*.yourdomain` 的A记录指向您服务器的IP.
+    - `*.local.homeinfra.org` 默认指向 `127.0.0.1`，本地测试可以直接使用。
+- 代理服务器（如有必要）.
+
+> 如果需要使用HTTPS，可以在外层新增一个HTTP网关（如Caddy），请参考后续章节。
+> **对于DockerHub镜像，我们强烈建议启用HTTPS**。
+
 
 修改 `.env` 文件，设置下列参数：
 

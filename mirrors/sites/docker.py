@@ -1,5 +1,6 @@
 import base64
 import json
+import logging
 import re
 import time
 from typing import Dict
@@ -10,6 +11,8 @@ from starlette.responses import Response
 
 from proxy.direct import direct_proxy
 from proxy.file_cache import try_file_based_cache
+
+logger = logging.getLogger(__name__)
 
 BASE_URL = "https://registry-1.docker.io"
 
@@ -36,11 +39,11 @@ def try_extract_image_name(path):
 
     if match:
         assert len(match.groups()) == 3
-        name, operation, reference = match.groups()
+        name, resource, reference = match.groups()
         assert re.match(name_regex, name)
         assert re.match(reference_regex, reference)
-        assert operation in ["manifests", "blobs"]
-        return name, operation, reference
+        assert resource in ["manifests", "blobs", "tags"]
+        return name, resource, reference
 
     return None, None, None
 
@@ -84,8 +87,6 @@ def inject_token(name: str, req: Request, httpx_req: httpx.Request):
 async def post_process(request: Request, response: Response):
     if response.status_code == 307:
         location = response.headers["location"]
-        # TODO: logger
-        print("[redirect]", location)
         return await try_file_based_cache(request, location)
 
     return response
@@ -93,7 +94,6 @@ async def post_process(request: Request, response: Response):
 
 async def docker(request: Request):
     path = request.url.path
-    print("[request]", request.method, request.url)
     if not path.startswith("/v2/"):
         return Response(content="Not Found", status_code=404)
 
@@ -101,7 +101,7 @@ async def docker(request: Request):
         return Response(content="OK")
         # return await direct_proxy(request, BASE_URL + '/v2/')
 
-    name, operation, reference = try_extract_image_name(path)
+    name, resource, reference = try_extract_image_name(path)
 
     if not name:
         return Response(content="404 Not Found", status_code=404)
@@ -110,10 +110,9 @@ async def docker(request: Request):
     if "/" not in name:
         name = f"library/{name}"
 
-    target_url = BASE_URL + f"/v2/{name}/{operation}/{reference}"
+    target_url = BASE_URL + f"/v2/{name}/{resource}/{reference}"
 
-    # logger
-    print("[PARSED]", path, name, operation, reference, target_url)
+    logger.info(f"got docker request, {path=} {name=} {resource=} {reference=} {target_url=}")
 
     return await direct_proxy(
         request,
