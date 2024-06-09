@@ -8,5 +8,5 @@ SCHEME = os.environ.get("SCHEME", None)
 assert SCHEME in ["http", "https"]
 
 CACHE_DIR = os.environ.get("CACHE_DIR", "/app/cache/")
-EXTERNAL_HOST_ARIA2 = f"aria2." + BASE_DOMAIN
+EXTERNAL_HOST_ARIA2 = f"aria2.{BASE_DOMAIN}"
 EXTERNAL_URL_ARIA2 = f"{SCHEME}://{EXTERNAL_HOST_ARIA2}/aria2/index.html"

@@ -8,20 +8,30 @@ import httpx
 from starlette.requests import Request
 from starlette.responses import Response
 
-from proxy.file_cache import try_file_based_cache
 from proxy.direct import direct_proxy
+from proxy.file_cache import try_file_based_cache
 
 BASE_URL = "https://registry-1.docker.io"
 
-cached_token: Dict[str, str] = {}
+
+class CachedToken:
+    token: str
+    exp: int
+
+    def __init__(self, token, exp):
+        self.token = token
+        self.exp = exp
+
+
+cached_tokens: Dict[str, CachedToken] = {}
 
 # https://github.com/opencontainers/distribution-spec/blob/main/spec.md
-name_regex = "[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*(\/[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*)*"
+name_regex = "[a-z0-9]+((.|_|__|-+)[a-z0-9]+)*(/[a-z0-9]+((.|_|__|-+)[a-z0-9]+)*)*"
 reference_regex = "[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}"
 
 
 def try_extract_image_name(path):
-    pattern = rf"^/v2/(.*)/([a-zA-Z]+)/(.*)$"
+    pattern = r"^/v2/(.*)/([a-zA-Z]+)/(.*)$"
     match = re.search(pattern, path)
 
     if match:
@@ -36,10 +46,9 @@ def try_extract_image_name(path):
 
 
 def get_docker_token(name):
-    cached = cached_token.get(name, {})
-    exp = cached.get("exp", 0)
-    if exp > time.time():
-        return cached.get("token", 0)
+    cached = cached_tokens.get(name, None)
+    if cached and cached.exp > time.time():
+        return cached.token
 
     url = "https://auth.docker.io/token"
     params = {
@@ -61,7 +70,7 @@ def get_docker_token(name):
     assert payload["iss"] == "auth.docker.io"
     assert len(payload["access"]) > 0
 
-    cached_token[name] = {"exp": payload["exp"], "token": token}
+    cached_tokens[name] = CachedToken(exp=payload["exp"], token=token)
 
     return token
 

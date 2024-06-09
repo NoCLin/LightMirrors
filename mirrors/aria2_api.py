@@ -10,9 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 async def send_request(method, params=None):
+    request_id = uuid.uuid4().hex
     payload = {
         "jsonrpc": "2.0",
-        "id": uuid.uuid4().hex,
+        "id": request_id,
         "method": method,
         "params": [f"token:{RPC_SECRET}"] + (params or []),
     }
@@ -22,13 +23,12 @@ async def send_request(method, params=None):
         mounts={"all://": httpx.AsyncHTTPTransport()}
     ) as client:
         response = await client.post(ARIA2_RPC_URL, json=payload)
-    logger.info(
-        f"aria2 request: {method} {params} -> {response.status_code} {response.text}"
-    )
     try:
         return response.json()
     except json.JSONDecodeError as e:
-        logger.warning(f"aria2 response: {response.status_code} {response.text}")
+        logger.warning(
+            f"aria2 request failed, response: {response.status_code} {response.text}"
+        )
         raise e
 
 

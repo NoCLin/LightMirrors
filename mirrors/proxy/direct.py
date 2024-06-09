@@ -51,9 +51,9 @@ async def direct_proxy(
 
         res_headers = upstream_response.headers
 
-        cl = res_headers.pop("content-length", None)
-        ce = res_headers.pop("content-encoding", None)
-        # print(target_url, cl, ce)
+        res_headers.pop("content-length", None)
+        res_headers.pop("content-encoding", None)
+
         content = upstream_response.content
         response = Response(
             headers=res_headers,
