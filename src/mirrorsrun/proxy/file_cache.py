@@ -7,14 +7,11 @@ from enum import Enum
 from urllib.parse import urlparse, quote
 
 import httpx
+from mirrorsrun.aria2_api import add_download
+from mirrorsrun.config import CACHE_DIR, EXTERNAL_URL_ARIA2
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_504_GATEWAY_TIMEOUT
-
-from mirrorsrun.aria2_api import add_download
-
-from mirrorsrun.config import CACHE_DIR, EXTERNAL_URL_ARIA2
-from typing import Optional, Callable
 
 logger = logging.getLogger(__name__)
 
@@ -76,14 +73,11 @@ async def try_file_based_cache(
     request: Request,
     target_url: str,
     download_wait_time: int = 60,
-    post_process: Optional[Callable[[Request, Response], Response]] = None,
 ) -> Response:
     cache_status = lookup_cache(target_url)
     if cache_status == DownloadingStatus.DOWNLOADED:
-        resp = make_cached_response(target_url)
-        if post_process:
-            resp = post_process(request, resp)
-        return resp
+        logger.info(f"Cache hit for {target_url}")
+        return make_cached_response(target_url)
 
     if cache_status == DownloadingStatus.DOWNLOADING:
         logger.info(f"Download is not finished, return 503 for {target_url}")
@@ -95,14 +89,15 @@ async def try_file_based_cache(
     assert cache_status == DownloadingStatus.NOT_FOUND
 
     cache_file, cache_file_dir = get_cache_file_and_folder(target_url)
-    print("prepare to download", target_url, cache_file, cache_file_dir)
+    logger.info(f"prepare to cache, {target_url=} {cache_file=} {cache_file_dir=}")
 
     processed_url = quote(target_url, safe="/:?=&%")
 
     try:
+        logger.info(f"Start download {processed_url}")
         await add_download(processed_url, save_dir=cache_file_dir)
     except Exception as e:
-        logger.error(f"Download error, return 503500 for {target_url}", exc_info=e)
+        logger.error(f"Download error, return 500 for {target_url}", exc_info=e)
         return Response(
             content=f"Failed to add download: {e}",
             status_code=HTTP_500_INTERNAL_SERVER_ERROR,
@@ -113,6 +108,7 @@ async def try_file_based_cache(
         await sleep(1)
         cache_status = lookup_cache(target_url)
         if cache_status == DownloadingStatus.DOWNLOADED:
+            logger.info(f"Cache hit for {target_url}")
             return make_cached_response(target_url)
     logger.info(f"Download is not finished, return 503 for {target_url}")
     return Response(

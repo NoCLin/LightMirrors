@@ -1,11 +1,13 @@
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))  # noqa: E402
 
 import base64
 import signal
 import urllib.parse
 from typing import Callable
+import logging
 
 import httpx
 import uvicorn
@@ -25,6 +27,19 @@ from mirrorsrun.sites.docker import docker
 from mirrorsrun.sites.npm import npm
 from mirrorsrun.sites.pypi import pypi
 from mirrorsrun.sites.torch import torch
+from mirrorsrun.sites.k8s import k8s
+
+subdomain_mapping = {
+    "pypi": pypi,
+    "torch": torch,
+    "docker": docker,
+    "npm": npm,
+    "k8s": k8s,
+}
+
+logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -73,14 +88,10 @@ async def capture_request(request: Request, call_next: Callable):
     if hostname.startswith("aria2."):
         return await aria2(request, call_next)
 
-    if hostname.startswith("pypi."):
-        return await pypi(request)
-    if hostname.startswith("torch."):
-        return await torch(request)
-    if hostname.startswith("docker."):
-        return await docker(request)
-    if hostname.startswith("npm."):
-        return await npm(request)
+    subdomain = hostname.split(".")[0]
+
+    if subdomain in subdomain_mapping:
+        return await subdomain_mapping[subdomain](request)
 
     return await call_next(request)
 
@@ -88,10 +99,10 @@ async def capture_request(request: Request, call_next: Callable):
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     port = 80
-    print(f"Server started at {SCHEME}://*.{BASE_DOMAIN})")
+    logger.info(f"Server started at {SCHEME}://*.{BASE_DOMAIN})")
 
-    for dn in ["pypi", "torch", "docker", "npm"]:
-        print(f" - {SCHEME}://{dn}.{BASE_DOMAIN}")
+    for dn in subdomain_mapping.keys():
+        logger.info(f" - {SCHEME}://{dn}.{BASE_DOMAIN}")
 
     aria2_secret = base64.b64encode(RPC_SECRET.encode()).decode()
 
@@ -106,14 +117,13 @@ if __name__ == "__main__":
     query_string = urllib.parse.urlencode(params)
     aria2_url_with_auth = EXTERNAL_URL_ARIA2 + "#!/settings/rpc/set?" + query_string
 
-    print(f"Download manager (Aria2) at {aria2_url_with_auth}")
-    # FIXME: only proxy headers if SCHEME is https
-    # reload only in dev mode
+    logger.info(f"Download manager (Aria2) at {aria2_url_with_auth}")
+
     uvicorn.run(
         app="server:app",
         host="0.0.0.0",
         port=port,
-        reload=True,
-        proxy_headers=True,
+        reload=True, # TODO: reload only in dev mode
+        proxy_headers=True,  # trust x-forwarded-for etc.
         forwarded_allow_ips="*",
     )
