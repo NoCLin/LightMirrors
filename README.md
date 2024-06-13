@@ -12,7 +12,7 @@
 
 
 LightMirrors是一个开源的缓存镜像站服务，用于加速软件包下载和镜像拉取。
-目前支持**DockerHub**、PyPI、PyTorch、NPM等镜像缓存服务。 当前项目仍处于早期阶段。
+目前支持**DockerHub**、**K8s**、**GitHub Container Registry**、**Quay.io**、PyPI、PyTorch、NPM等镜像缓存服务。 当前项目仍处于早期阶段。
 
 欢迎提交Pull Request和Issue，我们非常期待您的宝贵建议和意见。
 

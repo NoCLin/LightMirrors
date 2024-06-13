@@ -9,7 +9,7 @@
 [![GitHub](https://img.shields.io/github/stars/NoCLin/LightMirrors?style=social)](https://github.com/NoCLin/LightMirrors)
 [![GitHub](https://img.shields.io/github/forks/NoCLin/LightMirrors?style=social)](https://github.com/NoCLin/LightMirrors)
 
-LightMirrors is a lightweight mirror server with caching capabilities that currently supports DockerHub, PyPI, PyTorch, and NPM.
+LightMirrors is a lightweight mirror server with caching capabilities that currently supports DockerHub, K8s, GitHub Container Registry, Quay.io, PyPI, PyTorch, and NPM.
 
 **We only provide support for Chinese users currently. Please kindly submit an issue if you need English documents.**
 
