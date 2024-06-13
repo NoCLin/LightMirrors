@@ -5,3 +5,4 @@ caddy/caddy_data
 .idea
 .env
 node_modules
+**/__pycache__

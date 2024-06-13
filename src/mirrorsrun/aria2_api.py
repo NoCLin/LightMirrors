@@ -1,6 +1,7 @@
 import json
 import logging
 import uuid
+from typing import Optional
 
 import httpx
 
@@ -33,18 +34,20 @@ async def send_request(method, params=None):
         raise e
 
 
-async def add_download(url, save_dir="/app/cache", out_file=None):
-    logger.info(f"[Aria2] add_download {url=} {save_dir=} {out_file=}")
+async def add_download(
+    url, save_dir="/app/cache", out_file=None, headers: Optional[dict] = None
+):
+    logger.info(f"[Aria2] add_download {url=} {save_dir=} {out_file=} {headers=}")
 
     method = "aria2.addUri"
     options = {
         "dir": save_dir,
-        "header": [],
-        "out": out_file,
     }
 
     if out_file:
         options["out"] = out_file
+    if headers:
+        options["header"] = [f"{k}: {v}" for k, v in headers.items()]
 
     params = [[url], options]
     response = await send_request(method, params)

@@ -100,6 +100,11 @@ async def try_file_based_cache(
             processed_url,
             save_dir=cache_file_dir,
             out_file=os.path.basename(cache_file),
+            headers={
+                key: value
+                for key, value in request.headers.items()
+                if key in ["user-agent", "accept", "authorization"]
+            },
         )
     except Exception as e:
         logger.error(f"Download error, return 500 for {target_url}", exc_info=e)
