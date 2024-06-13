@@ -9,6 +9,7 @@ from mirrorsrun.config import RPC_SECRET, ARIA2_RPC_URL
 logger = logging.getLogger(__name__)
 
 
+# refer to https://aria2.github.io/manual/en/html/aria2c.html
 async def send_request(method, params=None):
     request_id = uuid.uuid4().hex
     payload = {
@@ -32,9 +33,20 @@ async def send_request(method, params=None):
         raise e
 
 
-async def add_download(url, save_dir="/app/cache"):
+async def add_download(url, save_dir="/app/cache", out_file=None):
+    logger.info(f"[Aria2] add_download {url=} {save_dir=} {out_file=}")
+
     method = "aria2.addUri"
-    params = [[url], {"dir": save_dir, "header": []}]
+    options = {
+        "dir": save_dir,
+        "header": [],
+        "out": out_file,
+    }
+
+    if out_file:
+        options["out"] = out_file
+
+    params = [[url], options]
     response = await send_request(method, params)
     return response["result"]
 

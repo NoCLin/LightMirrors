@@ -59,13 +59,15 @@ async def direct_proxy(
     target_url: str,
     pre_process: typing.Union[SyncPreProcessor, AsyncPreProcessor, None] = None,
     post_process: typing.Union[SyncPostProcessor, AsyncPostProcessor, None] = None,
+    follow_redirects: bool = True,
 ) -> Response:
+
     # httpx will use the following environment variables to determine the proxy
     # https://www.python-httpx.org/environment_variables/#http_proxy-https_proxy-all_proxy
     async with httpx.AsyncClient() as client:
         req_headers = request.headers.mutablecopy()
         for key in req_headers.keys():
-            if key not in ["user-agent", "accept"]:
+            if key not in ["user-agent", "accept", "authorization"]:
                 del req_headers[key]
 
         httpx_req: HttpxRequest = client.build_request(
@@ -76,7 +78,9 @@ async def direct_proxy(
 
         httpx_req = await pre_process_request(request, httpx_req, pre_process)
 
-        upstream_response = await client.send(httpx_req)
+        upstream_response = await client.send(
+            httpx_req, follow_redirects=follow_redirects
+        )
 
         res_headers = upstream_response.headers
 

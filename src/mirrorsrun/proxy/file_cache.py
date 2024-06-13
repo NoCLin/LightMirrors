@@ -7,11 +7,12 @@ from enum import Enum
 from urllib.parse import urlparse, quote
 
 import httpx
-from mirrorsrun.aria2_api import add_download
-from mirrorsrun.config import CACHE_DIR, EXTERNAL_URL_ARIA2
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_504_GATEWAY_TIMEOUT
+
+from mirrorsrun.aria2_api import add_download
+from mirrorsrun.config import CACHE_DIR, EXTERNAL_URL_ARIA2
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ async def try_file_based_cache(
         return make_cached_response(target_url)
 
     if cache_status == DownloadingStatus.DOWNLOADING:
-        logger.info(f"Download is not finished, return 503 for {target_url}")
+        logger.info(f"Download is not finished, return 504 for {target_url}")
         return Response(
             content=f"This file is downloading, view it at {EXTERNAL_URL_ARIA2}",
             status_code=HTTP_504_GATEWAY_TIMEOUT,
@@ -94,8 +95,12 @@ async def try_file_based_cache(
     processed_url = quote(target_url, safe="/:?=&%")
 
     try:
-        logger.info(f"Start download {processed_url}")
-        await add_download(processed_url, save_dir=cache_file_dir)
+        # resolve redirect via aria2
+        await add_download(
+            processed_url,
+            save_dir=cache_file_dir,
+            out_file=os.path.basename(cache_file),
+        )
     except Exception as e:
         logger.error(f"Download error, return 500 for {target_url}", exc_info=e)
         return Response(
@@ -110,7 +115,10 @@ async def try_file_based_cache(
         if cache_status == DownloadingStatus.DOWNLOADED:
             logger.info(f"Cache hit for {target_url}")
             return make_cached_response(target_url)
-    logger.info(f"Download is not finished, return 503 for {target_url}")
+
+    assert cache_status != DownloadingStatus.NOT_FOUND
+
+    logger.info(f"Download is not finished, return 504 for {target_url}")
     return Response(
         content=f"This file is downloading, view it at {EXTERNAL_URL_ARIA2}",
         status_code=HTTP_504_GATEWAY_TIMEOUT,

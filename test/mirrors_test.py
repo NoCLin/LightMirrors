@@ -19,5 +19,11 @@ class TestPypi(unittest.TestCase):
     def test_dockerhub_pull(self):
         call(f"docker pull docker.local.homeinfra.org/alpine:3.12")
 
+    def test_ghcr_pull(self):
+        call(f"docker pull ghcr.local.homeinfra.org/linuxcontainers/alpine")
+
+    def test_quay_pull(self):
+        call(f"docker pull quay.local.homeinfra.org/quay/busybox")
+
     def test_k8s_pull(self):
         call(f"docker pull k8s.local.homeinfra.org/pause:3.5")

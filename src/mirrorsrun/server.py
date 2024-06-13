@@ -23,21 +23,27 @@ from mirrorsrun.config import (
     EXTERNAL_HOST_ARIA2,
     SCHEME,
 )
-from mirrorsrun.sites.docker import docker
+
 from mirrorsrun.sites.npm import npm
 from mirrorsrun.sites.pypi import pypi
 from mirrorsrun.sites.torch import torch
-from mirrorsrun.sites.k8s import k8s
+from mirrorsrun.sites.docker import dockerhub, k8s, quay, ghcr
+from mirrorsrun.sites.common import common
 
 subdomain_mapping = {
+    "mirrors": common,
     "pypi": pypi,
     "torch": torch,
-    "docker": docker,
     "npm": npm,
+    "docker": dockerhub,
     "k8s": k8s,
+    "ghcr": ghcr,
+    "quay": quay,
 }
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +129,7 @@ if __name__ == "__main__":
         app="server:app",
         host="0.0.0.0",
         port=port,
-        reload=True, # TODO: reload only in dev mode
+        reload=True,  # TODO: reload only in dev mode
         proxy_headers=True,  # trust x-forwarded-for etc.
         forwarded_allow_ips="*",
     )
