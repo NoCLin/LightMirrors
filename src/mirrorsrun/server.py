@@ -27,7 +27,7 @@ from mirrorsrun.config import (
 from mirrorsrun.sites.npm import npm
 from mirrorsrun.sites.pypi import pypi
 from mirrorsrun.sites.torch import torch
-from mirrorsrun.sites.docker import dockerhub, k8s, quay, ghcr
+from mirrorsrun.sites.docker import dockerhub, k8s, quay, ghcr, nvcr
 from mirrorsrun.sites.common import common
 
 subdomain_mapping = {
@@ -39,6 +39,7 @@ subdomain_mapping = {
     "k8s": k8s,
     "ghcr": ghcr,
     "quay": quay,
+    "nvcr": nvcr,
 }
 
 logging.basicConfig(
