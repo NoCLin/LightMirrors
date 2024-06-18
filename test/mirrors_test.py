@@ -27,3 +27,6 @@ class TestPypi(unittest.TestCase):
 
     def test_k8s_pull(self):
         call(f"docker pull k8s.local.homeinfra.org/pause:3.5")
+
+    def test_nvcr_pull(self):
+        call(f"docker pull nvcr.local.homeinfra.org/nvidia/cuda")
