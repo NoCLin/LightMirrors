@@ -23,6 +23,8 @@ services:
       - ./aria2/aria2.conf:/aria2.conf
       - ./data/cache:/app/cache
       - ./data/aria2:/data/
+    ports:
+      - "6800:6800"
     networks:
       - app
     env_file:
