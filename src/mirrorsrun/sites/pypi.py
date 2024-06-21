@@ -3,11 +3,9 @@ import re
 from starlette.requests import Request
 from starlette.responses import Response
 
+from mirrorsrun.config import BASE_URL_PYPI, BASE_URL_PYPI_FILES
 from mirrorsrun.proxy.direct import direct_proxy
 from mirrorsrun.proxy.file_cache import try_file_based_cache
-
-pypi_file_base_url = "https://files.pythonhosted.org"
-pypi_base_url = "https://pypi.org"
 
 
 def pypi_replace(request: Request, response: Response) -> Response:
@@ -18,7 +16,7 @@ def pypi_replace(request: Request, response: Response) -> Response:
     if is_detail_page:
         mirror_url = f"{request.url.scheme}://{request.url.netloc}"
         content = response.body
-        content = content.replace(pypi_file_base_url.encode(), mirror_url.encode())
+        content = content.replace(BASE_URL_PYPI_FILES.encode(), mirror_url.encode())
         response.body = content
         del response.headers["content-length"]
         del response.headers["content-encoding"]
@@ -32,9 +30,10 @@ async def pypi(request: Request) -> Response:
         path = "/simple/"
 
     if path.startswith("/simple/"):
-        target_url = pypi_base_url + path
+        # FIXME: join
+        target_url = BASE_URL_PYPI + path
     elif path.startswith("/packages/"):
-        target_url = pypi_file_base_url + path
+        target_url = BASE_URL_PYPI_FILES + path
     else:
         return Response(content="Not Found", status_code=404)
 
