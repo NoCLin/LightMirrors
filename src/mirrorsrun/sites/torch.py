@@ -1,10 +1,9 @@
 from starlette.requests import Request
 from starlette.responses import Response
 
+from mirrorsrun.config import BASE_URL_PYTORCH
 from mirrorsrun.proxy.file_cache import try_file_based_cache
 from mirrorsrun.proxy.direct import direct_proxy
-
-BASE_URL = "https://download.pytorch.org"
 
 
 async def torch(request: Request):
@@ -16,7 +15,7 @@ async def torch(request: Request):
     if path == "/whl":
         path = "/whl/"
 
-    target_url = BASE_URL + path
+    target_url = BASE_URL_PYTORCH + path
 
     if path.endswith(".whl") or path.endswith(".tar.gz"):
         return await try_file_based_cache(request, target_url)

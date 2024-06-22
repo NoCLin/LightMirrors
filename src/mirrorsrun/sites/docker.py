@@ -1,12 +1,20 @@
 import logging
 import re
 
+from mirrorsrun.config import (
+    BASE_URL_DOCKERHUB,
+    BASE_URL_K8S,
+    BASE_URL_QUAY,
+    BASE_URL_GHCR,
+    BASE_URL_NVCR,
+)
 from mirrorsrun.proxy.direct import direct_proxy
 from mirrorsrun.proxy.file_cache import try_file_based_cache
 from starlette.requests import Request
 from starlette.responses import Response
 
 logger = logging.getLogger(__name__)
+
 
 HEADER_AUTH_KEY = "www-authenticate"
 
@@ -130,16 +138,11 @@ def dockerhub_name_mapper(name):
     return name
 
 
-k8s = build_docker_registry_handler(
-    "https://registry.k8s.io",
-)
-quay = build_docker_registry_handler(
-    "https://quay.io",
-)
-ghcr = build_docker_registry_handler(
-    "https://ghcr.io",
-)
-nvcr = build_docker_registry_handler("https://nvcr.io")
+k8s = build_docker_registry_handler(BASE_URL_K8S)
+quay = build_docker_registry_handler(BASE_URL_QUAY)
+ghcr = build_docker_registry_handler(BASE_URL_GHCR)
+nvcr = build_docker_registry_handler(BASE_URL_NVCR)
+
 dockerhub = build_docker_registry_handler(
-    "https://registry-1.docker.io", name_mapper=dockerhub_name_mapper
+    BASE_URL_DOCKERHUB, name_mapper=dockerhub_name_mapper
 )
