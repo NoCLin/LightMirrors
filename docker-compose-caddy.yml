@@ -8,21 +8,21 @@ services:
       - ./data/cache:/app/cache
     env_file:
       - .env
+    environment:
+      - SSL_SELF_SIGNED=false
     networks:
       - app
     restart: unless-stopped
     # for linux
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    ports:
-      - "80:80"
   caddy:
     image: lightmirrors/caddy
     build:
       context: caddy
       dockerfile: Dockerfile
-
     ports:
+      - "80:80"
       - "443:443"
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile

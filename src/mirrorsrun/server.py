@@ -21,7 +21,7 @@ from mirrorsrun.config import (
     RPC_SECRET,
     EXTERNAL_URL_ARIA2,
     EXTERNAL_HOST_ARIA2,
-    SCHEME,
+    SCHEME, SSL_SELF_SIGNED,
 )
 
 from mirrorsrun.sites.npm import npm
@@ -131,8 +131,10 @@ if __name__ == "__main__":
     uvicorn.run(
         app="server:app",
         host="0.0.0.0",
-        port=port,
+        ssl_keyfile='/app/certs/private.key' if SSL_SELF_SIGNED else None,
+        ssl_certfile='/app/certs/certificate.pem' if SSL_SELF_SIGNED else None,
+        port=443 if SSL_SELF_SIGNED else 80,
         reload=True,  # TODO: reload only in dev mode
-        proxy_headers=True,  # trust x-forwarded-for etc.
+        proxy_headers=not SSL_SELF_SIGNED,  # trust x-forwarded-for etc.
         forwarded_allow_ips="*",
     )

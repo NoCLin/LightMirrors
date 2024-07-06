@@ -1,0 +1,12 @@
+[req]
+req_extensions = v3_req
+distinguished_name = req_distinguished_name
+
+[req_distinguished_name]
+
+[v3_req]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = local.homeinfra.org
+DNS.2 = *.local.homeinfra.org

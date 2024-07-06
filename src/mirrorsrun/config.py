@@ -4,8 +4,9 @@ ARIA2_RPC_URL = os.environ.get("ARIA2_RPC_URL", "http://aria2:6800/jsonrpc")
 RPC_SECRET = os.environ.get("RPC_SECRET", "")
 BASE_DOMAIN = os.environ.get("BASE_DOMAIN", "local.homeinfra.org")
 
-SCHEME = os.environ.get("SCHEME", "http").lower()
-assert SCHEME in ["http", "https"]
+SCHEME = "https"
+
+SSL_SELF_SIGNED = os.environ.get("SSL_SELF_SIGNED", "true") == "true"
 
 CACHE_DIR = os.environ.get("CACHE_DIR", "/app/cache/")
 EXTERNAL_HOST_ARIA2 = f"aria2.{BASE_DOMAIN}"
