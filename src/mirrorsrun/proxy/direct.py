@@ -67,7 +67,7 @@ async def direct_proxy(
     async with httpx.AsyncClient() as client:
         req_headers = request.headers.mutablecopy()
         for key in req_headers.keys():
-            if key not in ["user-agent", "accept", "authorization"]:
+            if key in ["host"]:
                 del req_headers[key]
 
         httpx_req: HttpxRequest = client.build_request(
@@ -79,17 +79,15 @@ async def direct_proxy(
         httpx_req = await pre_process_request(request, httpx_req, pre_process)
 
         upstream_response = await client.send(
-            httpx_req, follow_redirects=follow_redirects
+            httpx_req,
+            follow_redirects=follow_redirects,
         )
 
-        res_headers = upstream_response.headers
+        res_headers = {key: value for key, value in upstream_response.headers.items()}
 
-        res_headers.pop("content-length", None)
-        res_headers.pop("content-encoding", None)
-
-        logger.info(
-            f"proxy {request.url} to {target_url} {upstream_response.status_code}"
-        )
+        if request.method != "HEAD":
+            res_headers.pop("content-length", None)
+            res_headers.pop("content-encoding", None)
 
         content = upstream_response.content
         response = Response(
