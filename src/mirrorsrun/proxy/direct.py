@@ -6,6 +6,7 @@ import httpx
 from httpx import Request as HttpxRequest
 from starlette.requests import Request
 from starlette.responses import Response
+from tenacity import retry, retry_if_exception_type, stop_after_attempt
 
 SyncPreProcessor = Callable[[Request, HttpxRequest], HttpxRequest]
 
@@ -54,6 +55,14 @@ async def post_process_response(
         return response
 
 
+@retry(
+    stop=stop_after_attempt(6),
+    retry=retry_if_exception_type(Exception),
+    reraise=True,
+    after=lambda retry_state: logger.warning(
+        f"retry {retry_state.attempt_number} {retry_state.outcome}"
+    ),
+)
 async def direct_proxy(
     request: Request,
     target_url: str,
@@ -74,6 +83,7 @@ async def direct_proxy(
             request.method,
             target_url,
             headers=req_headers,
+            timeout=30,
         )
 
         httpx_req = await pre_process_request(request, httpx_req, pre_process)
