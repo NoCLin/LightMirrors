@@ -9,7 +9,9 @@ RUN unzip AriaNg-1.3.7.zip && rm AriaNg-1.3.7.zip
 
 ADD requirements.txt /app/requirements.txt
 
-RUN pip install -r /app/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
+RUN pip install -r /app/requirements.txt
+
+ADD . /app
 
 WORKDIR /app
 
