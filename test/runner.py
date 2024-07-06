@@ -27,15 +27,15 @@ os.chdir(root_dir)
 
 if not os.path.exists(".env"):
     call("cp .env.example .env")
-call("docker-compose up -d --force-recreate --wait")
+call("docker compose up -d --force-recreate --wait")
 
 os.chdir(test_dir)
 
 try:
     for service in services:
-        call(f'docker-compose up --force-recreate --exit-code-from {service} {service}')
+        call(f'docker compose up --force-recreate --abort-on-container-exit --exit-code-from {service} {service}')
 except Exception as e:
     raise e
 finally:
     os.chdir(root_dir)
-    call("docker-compose down")
+    call("docker compose down")
