@@ -24,6 +24,9 @@ services = [
 ]
 
 os.chdir(root_dir)
+
+if not os.path.exists(".env"):
+    call("cp .env.example .env")
 call("docker-compose up -d --force-recreate --wait")
 
 os.chdir(test_dir)
