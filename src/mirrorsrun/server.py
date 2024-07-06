@@ -29,6 +29,7 @@ from mirrorsrun.sites.pypi import pypi
 from mirrorsrun.sites.torch import torch
 from mirrorsrun.sites.docker import dockerhub, k8s, quay, ghcr, nvcr
 from mirrorsrun.sites.common import common
+from mirrorsrun.sites.goproxy import goproxy
 
 subdomain_mapping = {
     "mirrors": common,
@@ -40,6 +41,7 @@ subdomain_mapping = {
     "ghcr": ghcr,
     "quay": quay,
     "nvcr": nvcr,
+    "goproxy": goproxy,
 }
 
 logging.basicConfig(
