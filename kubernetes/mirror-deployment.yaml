@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lightmirrors-mirror
+  namespace: lightmirrors
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lightmirrors-mirror
+  template:
+    metadata:
+      labels:
+        app: lightmirrors-mirror
+    spec:
+      containers:
+        - name: mirrors
+          image: lightmirrors/mirrors:v0.0.2 # Not on DockerHub. You need to build and post image yourself
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+          env:
+            - name: SSL_SELF_SIGNED
+              value: "true"
+            - name: EXTERNAL_HOST_ARIA2
+              value: "lightmirrors-aria2"
+            - name: BASE_DOMAIN
+              value: "lightmirrors"
+            - name: RPC_SECRET
+              value: changeMe
+            - name: K8S_SERVICE_NAME
+              value: "-lightmirrors"
+            - name: ARIA2_RPC_URL
+              value: "http://lightmirrors-aria2:6800/jsonrpc"
+          volumeMounts:
+            - name: cache-volume
+              mountPath: /app/cache
+      volumes:
+        - name: cache-volume
+          persistentVolumeClaim:
+            claimName: lightmirrors-pvc

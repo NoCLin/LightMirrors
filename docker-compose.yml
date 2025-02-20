@@ -4,12 +4,9 @@ services:
     build:
       context: ./src
     volumes:
-      - ./src/:/app
       - ./data/cache:/app/cache
     env_file:
       - .env
-    environment:
-      - SSL_SELF_SIGNED=true
     networks:
       - app
     restart: unless-stopped
@@ -23,7 +20,6 @@ services:
     image: lightmirrors/aria2
     build: ./aria2
     volumes:
-      - ./aria2/aria2.conf:/aria2.conf
       - ./data/cache:/app/cache
       - ./data/aria2:/data/
     networks:

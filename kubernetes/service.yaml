@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pypi-lightmirrors
+  namespace: lightmirrors
+spec:
+  selector:
+    app: lightmirrors-mirror
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 443
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lightmirrors-aria2
+  namespace: lightmirrors
+spec:
+  selector:
+    app: lightmirrors-aria2
+  ports:
+    - protocol: TCP
+      port: 6800
+      targetPort: 6800
+  type: ClusterIP

@@ -15,7 +15,7 @@ ADD . /app
 
 WORKDIR /app
 
-EXPOSE 8080
+EXPOSE 80 443
 
 CMD ["python", "mirrorsrun/server.py"]
 

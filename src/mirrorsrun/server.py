@@ -22,6 +22,7 @@ from mirrorsrun.config import (
     EXTERNAL_URL_ARIA2,
     EXTERNAL_HOST_ARIA2,
     SCHEME, SSL_SELF_SIGNED,
+    K8S_SERVICE_NAME,
 )
 
 from mirrorsrun.sites.npm import npm
@@ -32,16 +33,16 @@ from mirrorsrun.sites.common import common
 from mirrorsrun.sites.goproxy import goproxy
 
 subdomain_mapping = {
-    "mirrors": common,
-    "pypi": pypi,
-    "torch": torch,
-    "npm": npm,
-    "docker": dockerhub,
-    "k8s": k8s,
-    "ghcr": ghcr,
-    "quay": quay,
-    "nvcr": nvcr,
-    "goproxy": goproxy,
+    f"mirrors{K8S_SERVICE_NAME}": common,
+    f"pypi{K8S_SERVICE_NAME}": pypi,
+    f"torch{K8S_SERVICE_NAME}": torch,
+    f"npm{K8S_SERVICE_NAME}": npm,
+    f"docker{K8S_SERVICE_NAME}": dockerhub,
+    f"k8s{K8S_SERVICE_NAME}": k8s,
+    f"ghcr{K8S_SERVICE_NAME}": ghcr,
+    f"quay{K8S_SERVICE_NAME}": quay,
+    f"nvcr{K8S_SERVICE_NAME}": nvcr,
+    f"goproxy{K8S_SERVICE_NAME}": goproxy,
 }
 
 logging.basicConfig(
